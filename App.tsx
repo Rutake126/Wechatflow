@@ -32,6 +32,7 @@ const App: React.FC = () => {
   const [currentBg, setCurrentBg] = useState(BACKGROUNDS[0]);
   const [copied, setCopied] = useState(false);
   const [viewMode, setViewMode] = useState<'mobile' | 'desktop'>('mobile');
+  const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit');
   const [showThemeMenu, setShowThemeMenu] = useState(false);
   const [showBgMenu, setShowBgMenu] = useState(false);
 
@@ -82,30 +83,47 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col p-4 md:p-8 gap-6 max-w-[1600px] mx-auto overflow-hidden">
+    <div className="h-screen flex flex-col p-2 md:p-8 gap-4 md:gap-6 max-w-[1600px] mx-auto overflow-hidden">
       {/* Header */}
-      <header className="h-16 bg-white/80 backdrop-blur-md border-b border-zinc-200/50 flex items-center justify-between px-6 sticky top-0 z-10">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden">
+      <header className="h-14 md:h-16 flex items-center justify-between px-2 md:px-6 sticky top-0 z-10">
+        <div className="flex items-center gap-2 md:gap-3">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden shrink-0">
             <img src="/wechatflowlogo.png" alt="WeChatFlow Logo" className="w-full h-full object-cover" />
           </div>
-          <h1 className="text-lg font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">WeChatFlow</h1>
+          <h1 className="text-base md:text-lg font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent hidden sm:block">WeChatFlow</h1>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 md:gap-3">
+          {/* Mobile Tab Switcher */}
+          <div className="flex md:hidden bg-zinc-100 p-1 rounded-xl mr-2">
+            <button 
+              onClick={() => setActiveTab('edit')}
+              className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${activeTab === 'edit' ? 'bg-white shadow-sm text-emerald-600' : 'text-zinc-500'}`}
+            >
+              编辑
+            </button>
+            <button 
+              onClick={() => setActiveTab('preview')}
+              className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${activeTab === 'preview' ? 'bg-white shadow-sm text-emerald-600' : 'text-zinc-500'}`}
+            >
+              预览
+            </button>
+          </div>
+
           {/* Theme Selector */}
           <div className="relative" ref={themeMenuRef}>
             <button 
               onClick={() => { setShowThemeMenu(!showThemeMenu); setShowBgMenu(false); }}
-              className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm text-sm font-medium hover:bg-zinc-50 transition-colors border border-zinc-100"
+              className="flex items-center gap-1 md:gap-2 px-3 md:px-4 py-2 bg-white rounded-full shadow-sm text-xs md:text-sm font-medium hover:bg-zinc-50 transition-colors border border-zinc-100"
             >
-              <Palette size={16} style={{ color: currentTheme.colors.primary }} />
-              <span>风格: {currentTheme.name}</span>
-              <ChevronDown size={14} className={`transition-transform duration-300 ${showThemeMenu ? 'rotate-180' : ''}`} />
+              <Palette size={14} className="md:w-4 md:h-4" style={{ color: currentTheme.colors.primary }} />
+              <span className="hidden xs:inline">风格:</span>
+              <span className="max-w-[60px] md:max-w-none truncate">{currentTheme.name}</span>
+              <ChevronDown size={12} className={`md:w-3.5 md:h-3.5 transition-transform duration-300 ${showThemeMenu ? 'rotate-180' : ''}`} />
             </button>
 
             {showThemeMenu && (
-              <div className="absolute top-12 right-0 w-64 bg-white rounded-2xl shadow-2xl border border-zinc-100 z-[101] p-2 overflow-hidden shadow-zinc-300/50">
+              <div className="absolute top-12 right-0 w-48 md:w-64 bg-white rounded-2xl shadow-2xl border border-zinc-100 z-[101] p-2 overflow-hidden shadow-zinc-300/50">
                 {THEMES.map((theme) => {
                   const isSelected = currentTheme.id === theme.id;
                   return (
@@ -120,11 +138,11 @@ const App: React.FC = () => {
                         color: isSelected ? theme.colors.primary : '#52525b',
                         borderColor: isSelected ? theme.colors.primary : 'transparent'
                       }}
-                      className={`w-full flex flex-col items-start p-3 rounded-xl transition-all border ${
+                      className={`w-full flex flex-col items-start p-2 md:p-3 rounded-xl transition-all border text-xs md:text-sm ${
                         isSelected ? 'border-opacity-30' : 'hover:bg-zinc-50 border-transparent'
                       }`}
                     >
-                      <span className="text-sm font-bold">{theme.name}</span>
+                      <span className="font-bold">{theme.name}</span>
                     </button>
                   );
                 })}
@@ -136,15 +154,16 @@ const App: React.FC = () => {
           <div className="relative" ref={bgMenuRef}>
             <button 
               onClick={() => { setShowBgMenu(!showBgMenu); setShowThemeMenu(false); }}
-              className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm text-sm font-medium hover:bg-zinc-50 transition-colors border border-zinc-100"
+              className="flex items-center gap-1 md:gap-2 px-3 md:px-4 py-2 bg-white rounded-full shadow-sm text-xs md:text-sm font-medium hover:bg-zinc-50 transition-colors border border-zinc-100"
             >
-              <Grid3X3 size={16} style={{ color: currentTheme.colors.primary }} />
-              <span>背景: {currentBg.name}</span>
-              <ChevronDown size={14} className={`transition-transform duration-300 ${showBgMenu ? 'rotate-180' : ''}`} />
+              <Grid3X3 size={14} className="md:w-4 md:h-4" style={{ color: currentTheme.colors.primary }} />
+              <span className="hidden xs:inline">背景:</span>
+              <span className="max-w-[60px] md:max-w-none truncate">{currentBg.name}</span>
+              <ChevronDown size={12} className={`md:w-3.5 md:h-3.5 transition-transform duration-300 ${showBgMenu ? 'rotate-180' : ''}`} />
             </button>
 
             {showBgMenu && (
-              <div className="absolute top-12 right-0 w-52 bg-white rounded-2xl shadow-2xl border border-zinc-100 z-[101] p-2 shadow-zinc-300/50">
+              <div className="absolute top-12 right-0 w-48 bg-white rounded-2xl shadow-2xl border border-zinc-100 z-[101] p-2 shadow-zinc-300/50">
                 {BACKGROUNDS.map((bg) => {
                   const isSelected = currentBg.id === bg.id;
                   return (
@@ -159,20 +178,17 @@ const App: React.FC = () => {
                         color: isSelected ? currentTheme.colors.primary : '#52525b',
                         borderColor: isSelected ? currentTheme.colors.primary : 'transparent'
                       }}
-                      className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all border ${
+                      className={`w-full flex items-center gap-2 md:gap-3 p-2 md:p-3 rounded-xl transition-all border text-xs md:text-sm ${
                         isSelected ? 'border-opacity-30' : 'hover:bg-zinc-50 border-transparent'
                       }`}
                     >
-                      <div className="w-6 h-6 rounded border border-zinc-200 flex-shrink-0" 
+                      <div className="w-5 h-5 md:w-6 md:h-6 rounded border border-zinc-200 flex-shrink-0" 
                         style={{ 
-                          // Only show background pattern for non-grid items in preview if needed,
-                          // but user requested plain gray icon for 'grid-yellow' too.
-                          // So we effectively hide the background image for preview icons to keep them uniform gray.
                           backgroundImage: 'none', 
                           backgroundColor: '#f4f4f5' 
                         }}
                       />
-                      <span className="text-sm font-medium">{bg.name}</span>
+                      <span className="font-medium truncate">{bg.name}</span>
                     </button>
                   );
                 })}
@@ -182,54 +198,54 @@ const App: React.FC = () => {
         </div>
       </header>
 
-      <div className="flex-1 flex gap-6 overflow-hidden">
+      <div className="flex-1 flex flex-col md:flex-row gap-4 md:gap-6 overflow-hidden">
         {/* Editor */}
-        <div className="flex-1 flex flex-col bg-white rounded-[2rem] shadow-xl shadow-zinc-200/50 relative overflow-hidden group border border-zinc-100/50">
+        <div className={`flex-1 flex-col bg-white rounded-3xl md:rounded-[2rem] shadow-xl shadow-zinc-200/50 relative overflow-hidden group border border-zinc-100/50 ${activeTab === 'edit' ? 'flex' : 'hidden md:flex'}`}>
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
             spellCheck={false}
-            className="flex-1 p-10 text-lg leading-relaxed bg-transparent resize-none editor-textarea custom-scrollbar text-zinc-700 font-mono"
+            className="flex-1 p-6 md:p-10 text-base md:text-lg leading-relaxed bg-transparent resize-none editor-textarea custom-scrollbar text-zinc-700 font-mono"
             placeholder="在此输入你的 Markdown 内容..."
           />
-          <div className="absolute bottom-8 right-8 flex gap-3 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-             <button onClick={handleClear} className="w-12 h-12 flex items-center justify-center bg-white border border-zinc-100 text-zinc-400 rounded-2xl hover:bg-red-50 hover:text-red-500 hover:border-red-100 transition-all shadow-xl">
-               <Trash2 size={20} />
+          <div className="absolute bottom-6 right-6 md:bottom-8 md:right-8 flex gap-3 translate-y-2 md:translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+             <button onClick={handleClear} className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center bg-white border border-zinc-100 text-zinc-400 rounded-xl md:rounded-2xl hover:bg-red-50 hover:text-red-500 hover:border-red-100 transition-all shadow-xl">
+               <Trash2 size={18} />
              </button>
           </div>
         </div>
 
         {/* Preview */}
-        <div className="flex-1 flex flex-col bg-white rounded-[2rem] shadow-xl shadow-zinc-200/50 overflow-hidden relative border border-zinc-100/50">
-          <div className="flex items-center justify-between px-8 py-6 h-20 border-b border-zinc-50">
-            <div className="bg-zinc-100 p-1 rounded-2xl flex gap-1">
-              <button onClick={() => setViewMode('mobile')} className={`flex items-center gap-2 px-5 py-2 text-sm font-semibold rounded-xl transition-all ${viewMode === 'mobile' ? 'bg-white shadow-sm text-zinc-900' : 'text-zinc-500 hover:text-zinc-700'}`}><Smartphone size={16} /><span>手机</span></button>
-              <button onClick={() => setViewMode('desktop')} className={`flex items-center gap-2 px-5 py-2 text-sm font-semibold rounded-xl transition-all ${viewMode === 'desktop' ? 'bg-white shadow-sm text-zinc-900' : 'text-zinc-500 hover:text-zinc-700'}`}><Monitor size={16} /><span>桌面</span></button>
+        <div className={`flex-1 flex-col bg-white rounded-3xl md:rounded-[2rem] shadow-xl shadow-zinc-200/50 overflow-hidden relative border border-zinc-100/50 ${activeTab === 'preview' ? 'flex' : 'hidden md:flex'}`}>
+          <div className="flex items-center justify-between px-6 md:px-8 py-4 md:py-6 h-16 md:h-20 border-b border-zinc-50">
+            <div className="bg-zinc-100 p-1 rounded-xl md:rounded-2xl flex gap-1">
+              <button onClick={() => setViewMode('mobile')} className={`flex items-center gap-2 px-3 md:px-5 py-1.5 md:py-2 text-xs md:text-sm font-semibold rounded-lg md:rounded-xl transition-all ${viewMode === 'mobile' ? 'bg-white shadow-sm text-zinc-900' : 'text-zinc-500 hover:text-zinc-700'}`}><Smartphone size={14} className="md:w-4 md:h-4" /><span>手机</span></button>
+              <button onClick={() => setViewMode('desktop')} className={`flex items-center gap-2 px-3 md:px-5 py-1.5 md:py-2 text-xs md:text-sm font-semibold rounded-lg md:rounded-xl transition-all ${viewMode === 'desktop' ? 'bg-white shadow-sm text-zinc-900' : 'text-zinc-500 hover:text-zinc-700'}`}><Monitor size={14} className="md:w-4 md:h-4" /><span>桌面</span></button>
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto custom-scrollbar bg-[#f8f8f7] flex justify-center p-8">
+          <div className="flex-1 overflow-y-auto custom-scrollbar bg-[#f8f8f7] flex justify-center p-4 md:p-8">
             <div className={`transition-all duration-500 h-fit ${viewMode === 'mobile' ? 'w-full max-w-[375px]' : 'w-full max-w-[800px]'}`}>
               <div 
-                className="shadow-2xl rounded-2xl overflow-hidden bg-white min-h-[500px]"
+                className="shadow-2xl rounded-2xl overflow-hidden bg-white min-h-[400px] md:min-h-[500px]"
                 dangerouslySetInnerHTML={{ __html: renderedHTML }}
               />
             </div>
           </div>
 
-          <div className="absolute bottom-10 right-10">
+          <div className="absolute bottom-6 right-6 md:bottom-10 md:right-10">
             <button 
               onClick={handleCopy}
-              className={`flex items-center gap-2 px-8 py-5 rounded-full font-bold transition-all shadow-2xl active:scale-95 z-50 ${copied ? 'bg-emerald-500 text-white' : 'bg-zinc-900 text-white hover:bg-black'}`}
+              className={`flex items-center gap-2 px-6 md:px-8 py-3.5 md:py-5 rounded-full text-sm md:text-base font-bold transition-all shadow-2xl active:scale-95 z-50 ${copied ? 'bg-emerald-500 text-white' : 'bg-zinc-900 text-white hover:bg-black'}`}
             >
-              {copied ? <><CheckCircle2 size={20} /><span>复制成功</span></> : <><Copy size={20} /><span>复制到公众号</span></>}
+              {copied ? <><CheckCircle2 size={18} className="md:w-5 md:h-5" /><span>复制成功</span></> : <><Copy size={18} className="md:w-5 md:h-5" /><span>复制到公众号</span></>}
             </button>
           </div>
         </div>
       </div>
 
-      <div className="flex items-center justify-center py-2">
-         <span className="text-[10px] text-zinc-400 font-bold tracking-[0.2em] uppercase">Built for Premium Content Creators</span>
+      <div className="flex items-center justify-center py-1 md:py-2">
+         <span className="text-[8px] md:text-[10px] text-zinc-400 font-bold tracking-[0.1em] md:tracking-[0.2em] uppercase text-center">Built for Premium Content Creators</span>
       </div>
     </div>
   );
