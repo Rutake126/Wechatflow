@@ -83,13 +83,13 @@ const App: React.FC = () => {
 
   return (
     <div className="h-screen flex flex-col p-4 md:p-8 gap-6 max-w-[1600px] mx-auto overflow-hidden">
-      {/* Top Controls */}
-      <div className="flex justify-between items-center h-10">
+      {/* Header */}
+      <header className="h-16 bg-white/80 backdrop-blur-md border-b border-zinc-200/50 flex items-center justify-between px-6 sticky top-0 z-10">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-zinc-900 rounded-lg flex items-center justify-center">
-             <div className="w-3 h-3 border-2 border-white rounded-[1px]"></div>
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden">
+            <img src="/wechatflowlogo.png" alt="WeChatFlow Logo" className="w-full h-full object-cover" />
           </div>
-          <span className="font-bold text-lg tracking-tight">WeChatFlow</span>
+          <h1 className="text-lg font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">WeChatFlow</h1>
         </div>
 
         <div className="flex items-center gap-3">
@@ -180,7 +180,7 @@ const App: React.FC = () => {
             )}
           </div>
         </div>
-      </div>
+      </header>
 
       <div className="flex-1 flex gap-6 overflow-hidden">
         {/* Editor */}

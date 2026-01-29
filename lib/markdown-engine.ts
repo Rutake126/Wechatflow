@@ -24,10 +24,35 @@ export const renderToWeChatHTML = (markdown: string, theme: Theme, backgroundCss
   html = html.replace(/\r\n/g, '\n');
 
   // 2. Code & Pre (Process first to avoid conflicts)
-  html = html.replace(/```([\s\S]*?)```/g, (_, code) => {
-    return `<pre style="${styleToString(styles.pre)}"><code style="font-family: Menlo, Monaco, Consolas, Courier New, monospace; display: block; white-space: pre-wrap;">${code.trim()}</code></pre>`;
+  html = html.replace(/```([\s\S]*?)```/g, (_, content) => {
+    let code = content;
+    // Check if the content starts with a language identifier followed by a newline
+    const firstLineMatch = content.match(/^([a-zA-Z0-9+\-#\.]+)\n/);
+    if (firstLineMatch) {
+      // Remove the first line (language identifier)
+      code = content.slice(firstLineMatch[0].length);
+    }
+
+    // Escape HTML special characters
+    const escapedCode = code.trim()
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;")
+      // Prevent newlines from being treated as paragraphs later
+      .replace(/\n/g, '<br/>');
+
+    return `<pre style="${styleToString(styles.pre)}"><code style="font-family: Menlo, Monaco, Consolas, Courier New, monospace; display: block; white-space: pre-wrap;">${escapedCode}</code></pre>`;
   });
-  html = html.replace(/`(.*?)`/g, `<code style="${styleToString(styles.code)}">$1</code>`);
+  
+  html = html.replace(/`(.*?)`/g, (_, text) => {
+    const escapedText = text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+    return `<code style="${styleToString(styles.code)}">${escapedText}</code>`;
+  });
 
   // 3. Headings
   html = html.replace(/^### (.*$)/gm, `<h3 style="${styleToString(styles.h3)}">$1</h3>`);
@@ -65,9 +90,14 @@ export const renderToWeChatHTML = (markdown: string, theme: Theme, backgroundCss
                     trimmed.startsWith('<li') || 
                     trimmed.startsWith('<pre') || 
                     trimmed.startsWith('<hr') || 
-                    trimmed.startsWith('<img');
+                    trimmed.startsWith('<img') ||
+                    trimmed.startsWith('</div>') ||
+                    trimmed.startsWith('<div');
     
     if (isBlock) return trimmed;
+    // Don't wrap lines that are already inside a pre/code block
+    if (trimmed.startsWith('<code') || trimmed.startsWith('}</code>') || trimmed.startsWith('{') || trimmed.startsWith('}')) return trimmed;
+    
     return `<p style="${styleToString(styles.p)}">${trimmed}</p>`;
   });
   
